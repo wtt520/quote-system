@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报价系统</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <header>
+        <h1>报价系统</h1>
+        <div class="filter-container">
+            <button class="filter-btn active" data-category="all">全部</button>
+            <button class="filter-btn" data-category="box">包装盒</button>
+            <button class="filter-btn" data-category="bag">包装袋</button>
+            <button class="filter-btn" data-category="label">标签</button>
+        </div>
+    </header>
+
+    <div class="waterfall-container" id="waterfall">
+        <!-- 产品卡片将通过 JavaScript 动态生成 -->
+    </div>
+
+    <!-- 报价弹窗 -->
+    <div class="quote-modal" id="quoteModal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>产品报价计算</h2>
+            <form id="quoteForm">
+                <div class="form-container">
+                    <div class="form-section">
+                        <h3>基本信息</h3>
+                        <div class="form-group">
+                            <label for="paperArea">纸张面积（mm²）：</label>
+                            <input type="number" id="paperArea" placeholder="请输入纸张面积" required>
+                            <small class="input-help">计算方式：展开尺寸的长×宽</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="printArea">印刷面积（mm²）：</label>
+                            <input type="number" id="printArea" placeholder="请输入印刷面积" required>
+                            <small class="input-help">计算方式：实际印刷部分的面积</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="quantity">数量：</label>
+                            <input type="number" id="quantity" min="100" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="paperWeight">纸张克重（g）：</label>
+                            <input type="number" id="paperWeight" min="80" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>材料单价</h3>
+                        <div class="form-group">
+                            <label for="paperPrice">纸张单价（元/平方米）：</label>
+                            <input type="number" id="paperPrice" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="printColors">印刷颜色数：</label>
+                            <input type="number" id="printColors" min="1" max="4" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="printPrice">印刷单价（元/平方米）：</label>
+                            <input type="number" id="printPrice" step="0.01" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>工艺参数</h3>
+                    <div class="process-grid">
+                        <!-- 覆膜工艺 -->
+                        <div class="process-item">
+                            <h4>覆膜工艺</h4>
+                            <div class="form-group">
+                                <label for="laminationPrice">覆膜单价（元/平方米）：</label>
+                                <input type="number" id="laminationPrice" step="0.01" value="0.5">
+                            </div>
+                            <div class="form-group">
+                                <label for="laminationArea">覆膜面积（mm²）：</label>
+                                <input type="number" id="laminationArea" placeholder="长×宽">
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="needLamination">
+                                <label for="needLamination">需要覆膜</label>
+                            </div>
+                        </div>
+
+                        <!-- 模切工艺 -->
+                        <div class="process-item">
+                            <h4>模切工艺</h4>
+                            <div class="form-group">
+                                <label for="dieCutPrice">模切单价（元/平方米）：</label>
+                                <input type="number" id="dieCutPrice" step="0.01" value="0.8">
+                            </div>
+                            <div class="form-group">
+                                <label for="dieCutArea">模切面积（mm²）：</label>
+                                <input type="number" id="dieCutArea" placeholder="长×宽">
+                            </div>
+                            <div class="form-group">
+                                <label for="dieCutLines">模切刀线长度（mm）：</label>
+                                <input type="number" id="dieCutLines" placeholder="总长度">
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="needDieCut">
+                                <label for="needDieCut">需要模切</label>
+                            </div>
+                        </div>
+
+                        <!-- 粘盒工艺 -->
+                        <div class="process-item">
+                            <h4>粘盒工艺</h4>
+                            <div class="form-group">
+                                <label for="gluePrice">粘盒单价（元/平方米）：</label>
+                                <input type="number" id="gluePrice" step="0.01" value="0.3">
+                            </div>
+                            <div class="form-group">
+                                <label for="glueArea">粘盒面积（mm²）：</label>
+                                <input type="number" id="glueArea" placeholder="粘合面积">
+                            </div>
+                            <div class="form-group">
+                                <label for="gluePoints">粘合点数量：</label>
+                                <input type="number" id="gluePoints" placeholder="粘合点数">
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="needGlue">
+                                <label for="needGlue">需要粘盒</label>
+                            </div>
+                        </div>
+
+                        <!-- 绳子工艺 -->
+                        <div class="process-item">
+                            <h4>绳子工艺</h4>
+                            <div class="form-group">
+                                <label for="ropePrice">绳子单价（元/米）：</label>
+                                <input type="number" id="ropePrice" step="0.01" value="0.2">
+                            </div>
+                            <div class="form-group">
+                                <label for="ropeLength">绳子长度（mm）：</label>
+                                <input type="number" id="ropeLength" placeholder="每个产品所需长度">
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="needRope">
+                                <label for="needRope">需要绳子</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>其他费用</h3>
+                    <div class="other-costs-grid">
+                        <div class="form-group">
+                            <label for="packingPrice">打包基础费用（元/千件）：</label>
+                            <input type="number" id="packingPrice" value="50" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="shippingRate">运费率（元/公里/千克）：</label>
+                            <input type="number" id="shippingRate" step="0.01" value="0.5" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="shippingDistance">运输距离（公里）：</label>
+                            <input type="number" id="shippingDistance" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profitRate">利润率（%）：</label>
+                            <input type="number" id="profitRate" value="30" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="taxRate">税率（%）：</label>
+                            <input type="number" id="taxRate" value="13" required>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">计算报价</button>
+            </form>
+            <div id="quoteResult"></div>
+        </div>
+    </div>
+
+    <script src="./script.js"></script>
+</body>
+</html> 
